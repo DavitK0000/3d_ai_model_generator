@@ -5,8 +5,19 @@ import { useDropzone } from 'react-dropzone';
 import { UploadIcon, XIcon } from 'lucide-react'; // Adjust this to match your icon library
 import { useCallback, useState } from 'react';
 
-const FileUpload = ({ allowedTypes = ['image/jpeg', 'image/png'], maxSize = 5 * 1024 * 1024, multiple = false, onFilesChange }) => {
-    const [files, setFiles] = useState<Array<File>>([]); // Track multiple files
+interface FileUploadProps {
+    allowedTypes: Array<string>; // Define the data type as per your needs
+    maxSize: number;
+    multiple: boolean;
+    onFilesChange: (files: any) => void;
+}
+
+interface FileWithPreview extends File {
+    preview: string; // Add the preview property
+}
+
+const FileUpload: React.FC<FileUploadProps> = ({ allowedTypes = ['image/jpeg', 'image/png'], maxSize = 5 * 1024 * 1024, multiple = false, onFilesChange }) => {
+    const [files, setFiles] = useState<Array<FileWithPreview>>([]); // Track multiple files
     const [highlight, setHighlight] = useState(false);
 
     // File drop handler
@@ -27,10 +38,16 @@ const FileUpload = ({ allowedTypes = ['image/jpeg', 'image/png'], maxSize = 5 * 
         setFiles((prevFiles) => prevFiles.filter(file => file.name !== fileName));
     };
 
+    // Create the accept object from allowedTypes
+    const accept = allowedTypes.reduce((acc: { [key: string]: [] }, type) => {
+        acc[type] = []; // Each key is a MIME type; values can be `undefined`
+        return acc;
+    }, {});
+
     // Dropzone hook configuration
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
-        accept: allowedTypes.join(','),
+        accept,
         maxSize,
         multiple,
         onDragEnter: () => setHighlight(true),

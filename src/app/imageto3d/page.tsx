@@ -2,7 +2,6 @@
 
 import ThreeScene from "@/components/threeScene";
 import Sidebar from "@/components/sidebar";
-import Image from "next/image";
 import SettingsPanel from '@/app/imageto3d/settingsPanel'
 import { useState } from 'react';
 import axios from 'axios';
@@ -48,41 +47,41 @@ export default function Home() {
         }
     };
 
-    const handleImageToModelTest = async (fileToken: string) => {
-        setLoading(true);
-        setError(null);
-        setLoadingPercentage(0);
-        setModelUrl(null); // Reset model URL
+    // const handleImageToModelTest = async (fileToken: string) => {
+    //     setLoading(true);
+    //     setError(null);
+    //     setLoadingPercentage(0);
+    //     setModelUrl(null); // Reset model URL
 
-        // Simulate task completion with hardcoded URL
-        const simulatedModelUrl = 'https://tripo-data.cdn.bcebos.com/tcli_ecf78bb535bd479fb8fd3fbc6324e0f7/20240922/ea23bd76-275c-4c1d-ba53-d9577c3488dc/tripo_draft_ea23bd76-275c-4c1d-ba53-d9577c3488dc.glb?auth_key=1727022205-bKemzfHs-0-e80c9fdd9b14b7da615057a471f4a1c3'; // Hardcoded GLB URL
+    //     // Simulate task completion with hardcoded URL
+    //     const simulatedModelUrl = 'https://tripo-data.cdn.bcebos.com/tcli_ecf78bb535bd479fb8fd3fbc6324e0f7/20240922/ea23bd76-275c-4c1d-ba53-d9577c3488dc/tripo_draft_ea23bd76-275c-4c1d-ba53-d9577c3488dc.glb?auth_key=1727022205-bKemzfHs-0-e80c9fdd9b14b7da615057a471f4a1c3'; // Hardcoded GLB URL
 
-        // Simulate loading process
-        try {
-            setLoadingPercentage(0);
-            const loadingInterval = setInterval(() => {
-                setLoadingPercentage((prev) => {
-                    if (prev >= 100) {
-                        clearInterval(loadingInterval);
-                        setLoading(false);
-                        downloadModel('glb', simulatedModelUrl); // Start downloading the model
-                        return 100;
-                    }
-                    return prev + 10; // Increase percentage by 10
-                });
-            }, 300); // Simulate loading every 300 ms
+    //     // Simulate loading process
+    //     try {
+    //         setLoadingPercentage(0);
+    //         const loadingInterval = setInterval(() => {
+    //             setLoadingPercentage((prev) => {
+    //                 if (prev >= 100) {
+    //                     clearInterval(loadingInterval);
+    //                     setLoading(false);
+    //                     downloadModel('glb', simulatedModelUrl); // Start downloading the model
+    //                     return 100;
+    //                 }
+    //                 return prev + 10; // Increase percentage by 10
+    //             });
+    //         }, 300); // Simulate loading every 300 ms
 
-        } catch (err) {
-            setLoading(false);
-            const errorMessage = 'Simulated error during loading'; // Simulated error
-            setError(errorMessage);
-            toast({
-                variant: "destructive",
-                title: "Error",
-                description: errorMessage,
-            });
-        }
-    };
+    //     } catch (err) {
+    //         setLoading(false);
+    //         const errorMessage = 'Simulated error during loading'; // Simulated error
+    //         setError(errorMessage);
+    //         toast({
+    //             variant: "destructive",
+    //             title: "Error",
+    //             description: errorMessage,
+    //         });
+    //     }
+    // };
 
     const downloadModel = async (type: string, url: string) => {
         try {
@@ -99,6 +98,7 @@ export default function Home() {
         } catch (err) {
             const errorMessage = axios.isAxiosError(err) && err.response ? err.response.data : 'Error downloading model';
             setError(errorMessage);
+            console.log(error);
             toast({
                 variant: "destructive",
                 title: "Error",

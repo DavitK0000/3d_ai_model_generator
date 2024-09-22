@@ -4,6 +4,8 @@ import axios from 'axios';
 
 export async function GET(request: Request, { params }: { params: { taskId: string } }) {
     // Access headers from the incoming request
+    const { taskId } = params; // Extract the dynamic taskId from the URL
+
     const headers = request.headers;
 
     // Example of getting a specific header
@@ -19,7 +21,7 @@ export async function GET(request: Request, { params }: { params: { taskId: stri
 
     try {
         // You could use the Authorization header for an API call, for example
-        const response = await axios.get('https://api.tripo3d.ai/v2/openapi/task', {
+        const response = await axios.get(`https://api.tripo3d.ai/v2/openapi/task/${taskId}`, {
             headers: {
                 'Authorization': authHeader, // Forward the Authorization header
             },
@@ -28,7 +30,7 @@ export async function GET(request: Request, { params }: { params: { taskId: stri
         return NextResponse.json(response.data, { status: response.status });
     } catch (error) {
         console.error(error);
-        const axiosError = error as { response?: { status: number; data: any } };
+        const axiosError = error as { response?: { status: number; data: Object } };
         return NextResponse.json(axiosError.response?.data || { message: 'Internal Server Error' }, {
             status: axiosError.response?.status || 500,
         });

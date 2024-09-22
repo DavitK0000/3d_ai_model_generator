@@ -1,13 +1,12 @@
 // pages/ThreeScene.js
 'use client'
 
-import { Canvas, useLoader } from '@react-three/fiber';
-import { OrbitControls, GizmoHelper, GizmoViewport } from '@react-three/drei';
+import { Canvas } from '@react-three/fiber';
+import { OrbitControls } from '@react-three/drei';
 import { useSpring, a } from '@react-spring/three'; // 'a' stands for animated
 import { useEffect, useState } from 'react';
-import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'; // Import the FBX loader
-import { TextureLoader } from 'three'; // Import the Texture loader
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+// import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'; // Import the FBX loader
+import GLBModelLoader from './ModelLoader/GLBModelLoader';
 
 function AnimatedGrid() {
     // State to trigger the animation only once after the component mounts
@@ -25,8 +24,14 @@ function AnimatedGrid() {
         setStartAnimation(true);
     }, []);
 
+    // Using the get() method to extract the current position and scale
+    const currentPosition = position.get(); // This gives you an array
+
     return (
-        <a.group position={position} scale={scale}> {/* 'a.group' is an animated group */}
+        <a.group
+            position={currentPosition as [number, number, number]} // Convert to Vector3
+            scale={scale.to((sx, sy, sz) => [sx, sy, sz])} // Convert to a tuple
+        >
             <gridHelper args={[10, 10, 'white', 'gray']} />
             {/* <axesHelper args={[5]} /> */}
         </a.group>
@@ -34,45 +39,23 @@ function AnimatedGrid() {
 }
 
 // FBX Model Loader component
-function FBXModel({ path, texturePath, position }) {
-    const fbx = useLoader(FBXLoader, path); // Load the FBX model
-    const texture = useLoader(TextureLoader, texturePath); // Load the texture
+// function FBXModel({ path, texturePath, position }) {
+//     const fbx = useLoader(FBXLoader, path); // Load the FBX model
+//     const texture = useLoader(TextureLoader, texturePath); // Load the texture
 
-    // Traverse the FBX model and apply the texture to all mesh materials
-    useEffect(() => {
-        fbx.traverse((child) => {
-            if (child.isMesh) {
-                child.material.map = texture;
-                child.material.needsUpdate = true;
-            }
-        });
-    }, [fbx, texture]);
+//     // Traverse the FBX model and apply the texture to all mesh materials
+//     useEffect(() => {
+//         fbx.traverse((child) => {
+//             if (child.isMesh) {
+//                 child.material.map = texture;
+//                 child.material.needsUpdate = true;
+//             }
+//         });
+//     }, [fbx, texture]);
 
-    // Adjust the position of the model
-    return <primitive object={fbx} scale={[0.01, 0.01, 0.01]} position={position} />;
-}
-
-const GLBModel = ({ path, texturePath, position }) => {
-    // Load the GLB model
-    if(path == null)
-        return;
-    const gltf = useLoader(GLTFLoader, path);
-    // Conditionally load the texture if texturePath is provided
-    const texture = texturePath ? useLoader(TextureLoader, texturePath) : null;
-
-    // Traverse the GLB model and apply the texture to all mesh materials if available
-    useEffect(() => {
-        gltf.scene.traverse((child) => {
-            if (child.isMesh && texture) {
-                // child.material.map = texture;
-                child.material.needsUpdate = true;
-            }
-        });
-    }, [gltf, texture]);
-
-    // Adjust the position of the model
-    return <primitive object={gltf.scene} scale={[2, 2, 2]} position={position} />;
-}
+//     // Adjust the position of the model
+//     return <primitive object={fbx} scale={[0.01, 0.01, 0.01]} position={position} />;
+// }
 
 interface ThreeSceneProps {
     modelUrl: string | null; // Accept modelUrl prop
@@ -91,8 +74,7 @@ const ThreeScene: React.FC<ThreeSceneProps> = ({ modelUrl }) => {
                     position={[0, 1, 0]} /> {/* Adjust the path as per your project structure */}
 
                 {/* GLB Model */}
-                <GLBModel path={modelUrl}
-                    position={[0, 1, 0]} /> {/* Adjust the path as per your project structure */}
+                <GLBModelLoader path={modelUrl} position={[0, 1, 0]} /> {/* Adjust the path as per your project structure */}
 
                 {/* Animated Grid */}
                 <AnimatedGrid />

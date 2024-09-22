@@ -27,6 +27,8 @@ interface ComboBoxItems {
 interface ComboBoxProps {
     items: ComboBoxItems[]; // Ensure items is always an array of strings
     placeholder?: string;
+    onChange: (value : any) => void,
+    value : string
 }
 
 const ComboBox: React.FC<ComboBoxProps> = ({ items = [], placeholder = "Select an item", onChange, value = "" }) => {

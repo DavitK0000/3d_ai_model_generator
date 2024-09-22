@@ -1,18 +1,25 @@
 'use client'
 
-import { UploadIcon, InfoIcon } from 'lucide-react'; // Adjust this according to your icon library
+import { InfoIcon } from 'lucide-react'; // Adjust this according to your icon library
 import { useState } from 'react';
 import FileUpload from '@/components/FileUpload';
 import ComboBox from '@/components/ui/combobox';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useSelector } from 'react-redux';
-import store from '@/app/store/store';
-import { RootState } from '@react-three/fiber';
+import PropTypes from 'prop-types';
 import axios, { AxiosError } from 'axios';
-
+interface SettingsPanelProps {
+    onSubmit: (data: string) => void; // Define the data type as per your needs
+}
+interface RootState {
+    api: {
+        tripoApiKey: string | null;
+        tripoClientId: string | null;
+    }
+}
 // The SettingsPanel Component
-const SettingsPanel = ({ onSubmit }) => {
+const SettingsPanel: React.FC<SettingsPanelProps> = ({ onSubmit }) => {
     const [selectedModel, setSelectedModel] = useState<string>('');
     const [uploadedFiles, setUploadedFiles] = useState<Array<File>>([]);
     const { toast } = useToast();
@@ -138,6 +145,10 @@ const SettingsPanel = ({ onSubmit }) => {
             </div>
         </div >
     );
+};
+
+SettingsPanel.propTypes = {
+    onSubmit: PropTypes.func.isRequired,
 };
 
 export default SettingsPanel;
