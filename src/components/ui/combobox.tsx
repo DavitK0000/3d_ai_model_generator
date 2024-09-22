@@ -29,9 +29,8 @@ interface ComboBoxProps {
     placeholder?: string;
 }
 
-const ComboBox: React.FC<ComboBoxProps> = ({ items = [], placeholder = "Select an item" }) => {
+const ComboBox: React.FC<ComboBoxProps> = ({ items = [], placeholder = "Select an item", onChange, value = "" }) => {
     const [open, setOpen] = React.useState(false)
-    const [value, setValue] = React.useState("")
 
     return (
         <Popover open={open} onOpenChange={setOpen}>
@@ -44,13 +43,13 @@ const ComboBox: React.FC<ComboBoxProps> = ({ items = [], placeholder = "Select a
                 >
                     {value
                         ? items.find((item) => item.value === value)?.label
-                        : "Select framework..."}
+                        : "Select model..."}
                     <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
             </PopoverTrigger>
             <PopoverContent className="w-[200px] p-0">
                 <Command>
-                    <CommandInput placeholder="Search framework..." className="h-9" />
+                    <CommandInput placeholder="Search model..." className="h-9" />
                     <CommandList>
                         <CommandEmpty>No framework found.</CommandEmpty>
                         <CommandGroup>
@@ -59,8 +58,9 @@ const ComboBox: React.FC<ComboBoxProps> = ({ items = [], placeholder = "Select a
                                     key={item.value}
                                     value={item.value}
                                     onSelect={(currentValue) => {
-                                        setValue(currentValue === value ? "" : currentValue)
-                                        setOpen(false)
+                                        const newValue = currentValue === value ? "" : currentValue;
+                                        onChange(newValue); // Call the onChange prop
+                                        setOpen(false);
                                     }}
                                 >
                                     {item.label}

@@ -7,6 +7,7 @@ import { useSpring, a } from '@react-spring/three'; // 'a' stands for animated
 import { useEffect, useState } from 'react';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'; // Import the FBX loader
 import { TextureLoader } from 'three'; // Import the Texture loader
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
 function AnimatedGrid() {
     // State to trigger the animation only once after the component mounts
@@ -51,16 +52,46 @@ function FBXModel({ path, texturePath, position }) {
     return <primitive object={fbx} scale={[0.01, 0.01, 0.01]} position={position} />;
 }
 
-export default function ThreeScene() {
+const GLBModel = ({ path, texturePath, position }) => {
+    // Load the GLB model
+    if(path == null)
+        return;
+    const gltf = useLoader(GLTFLoader, path);
+    // Conditionally load the texture if texturePath is provided
+    const texture = texturePath ? useLoader(TextureLoader, texturePath) : null;
+
+    // Traverse the GLB model and apply the texture to all mesh materials if available
+    useEffect(() => {
+        gltf.scene.traverse((child) => {
+            if (child.isMesh && texture) {
+                // child.material.map = texture;
+                child.material.needsUpdate = true;
+            }
+        });
+    }, [gltf, texture]);
+
+    // Adjust the position of the model
+    return <primitive object={gltf.scene} scale={[2, 2, 2]} position={position} />;
+}
+
+interface ThreeSceneProps {
+    modelUrl: string | null; // Accept modelUrl prop
+}
+
+const ThreeScene: React.FC<ThreeSceneProps> = ({ modelUrl }) => {
     return (
         <div style={{ height: '100%', width: '100%' }} className='three-scene'>
             <Canvas camera={{ position: [10, 10, 10], fov: 50, near: 0.1, far: 1000 }}>
                 <ambientLight intensity={0.5} />
                 <directionalLight position={[5, 5, 5]} />
 
-                {/* FBX Model */}
+                {/* FBX Model 
                 <FBXModel path="/models/chibi_knight_0921172038.fbx"
                     texturePath="/models/chibi_knight_0921172038.png"  // Replace with your actual texture path
+                    position={[0, 1, 0]} /> {/* Adjust the path as per your project structure */}
+
+                {/* GLB Model */}
+                <GLBModel path={modelUrl}
                     position={[0, 1, 0]} /> {/* Adjust the path as per your project structure */}
 
                 {/* Animated Grid */}
@@ -75,3 +106,5 @@ export default function ThreeScene() {
         </div>
     );
 }
+
+export default ThreeScene;

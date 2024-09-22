@@ -5,21 +5,25 @@ import { useDropzone } from 'react-dropzone';
 import { UploadIcon, XIcon } from 'lucide-react'; // Adjust this to match your icon library
 import { useCallback, useState } from 'react';
 
-const FileUpload = ({ allowedTypes = ['image/jpeg', 'image/png'], maxSize = 5 * 1024 * 1024, multiple = false }) => {
+const FileUpload = ({ allowedTypes = ['image/jpeg', 'image/png'], maxSize = 5 * 1024 * 1024, multiple = false, onFilesChange }) => {
     const [files, setFiles] = useState<Array<File>>([]); // Track multiple files
     const [highlight, setHighlight] = useState(false);
 
     // File drop handler
-    const onDrop = useCallback((acceptedFiles : Array<File>) => {
+    const onDrop = useCallback((acceptedFiles: Array<File>) => {
         const mappedFiles = acceptedFiles.map(file => Object.assign(file, {
             preview: URL.createObjectURL(file)
         }));
-        setFiles(prevFiles => [...prevFiles, ...mappedFiles]); // Add new files
+        const newFiles = [...files, ...mappedFiles];
+        setFiles(newFiles); // Add new files
         setHighlight(false); // Reset highlight
+
+        // Call parent callback to notify about file changes
+        onFilesChange(newFiles);
     }, []);
 
     // Remove file handler
-    const removeFile = (fileName : String) => {
+    const removeFile = (fileName: String) => {
         setFiles((prevFiles) => prevFiles.filter(file => file.name !== fileName));
     };
 
